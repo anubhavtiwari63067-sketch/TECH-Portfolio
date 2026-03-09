@@ -1,65 +1,133 @@
-import Image from "next/image";
+'use client';
+
+import { Suspense, useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Starfield } from "./components/three/Starfield";
+import { Grid } from "./components/three/Grid";
+import { OrbitControls, Float, ScrollControls } from "@react-three/drei";
+import LandingOverlay from "./components/ui/LandingOverlay";
+import Navbar from "./components/ui/Navbar";
+import Hero from "./components/ui/Hero";
+import ProjectCarousel from "./components/ui/ProjectCarousel";
+import About from "./components/ui/About";
+import Certifications from "./components/ui/Certifications";
+import Contact from "./components/ui/Contact";
+import Footer from "./components/ui/Footer";
+import MusicPlayer from "./components/ui/MusicPlayer";
+import { Avatar3D } from "./components/three/Avatar3D";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
+  const [hasStarted, setHasStarted] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (hasStarted) {
+      const timer = setTimeout(() => setShowContent(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasStarted]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="relative bg-black min-h-screen text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-400">
+      
+      {/* 3D Background - Always there, but transitions its intensity */}
+      <div className={`fixed inset-0 z-0 pointer-events-none transition-opacity duration-1000 ${hasStarted ? 'opacity-100' : 'opacity-40'}`}>
+        {mounted && (
+          <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+            <fog attach="fog" args={["#000", 2, 12]} />
+            <ambientLight intensity={1.5} />
+            <pointLight position={[5, 5, 5]} intensity={1.5} />
+            <color attach="background" args={["#000"]} />
+            <Suspense fallback={null}>
+              <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+                <Starfield />
+              </Float>
+              {hasStarted && (
+                <group scale={showContent ? 1 : 0}>
+                  <Grid />
+                  {/* Positioned for the Hero section top-right */}
+                  <group position={[3, 1, 0]}>
+                    <Avatar3D isVisible={showContent} />
+                  </group>
+                </group>
+              )}
+              <OrbitControls 
+                enableZoom={false} 
+                enablePan={false} 
+                autoRotate 
+                autoRotateSpeed={0.5} 
+              />
+            </Suspense>
+          </Canvas>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {!hasStarted && (
+          <LandingOverlay onStart={() => setHasStarted(true)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showContent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="relative z-10"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <Navbar />
+            <div className="relative overflow-hidden pt-16">
+              <Hero />
+              <ProjectCarousel />
+              <About />
+              <Certifications />
+              <Contact />
+              <Footer />
+            </div>
+            <MusicPlayer autoPlay />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style jsx global>{`
+        body {
+          margin: 0;
+          background: #000;
+          color: #fff;
+          overflow-x: hidden;
+        }
+
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        .animate-gradient-x {
+          background-size: 200% 200%;
+          animation: gradient-x 15s ease infinite;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        ::selection {
+          background: rgba(34, 211, 238, 0.3);
+          color: #22d3ee;
+        }
+      `}</style>
+    </main>
   );
 }
