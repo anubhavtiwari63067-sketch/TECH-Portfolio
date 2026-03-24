@@ -39,7 +39,7 @@ export function Avatar3D({ isVisible }: { isVisible: boolean }) {
 
     // Smooth Entrance Scale (Direct property modification for performance)
     const targetScale = isVisible ? 1 : 0;
-    groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.05));
+    groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.08));
 
     // Calculate Target Position
     let targetX = 0;
@@ -75,7 +75,7 @@ export function Avatar3D({ isVisible }: { isVisible: boolean }) {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, 0]} scale={0}>
+    <group ref={groupRef} position={[0, 0, 0]} scale={0.01}>
       <Float speed={2.5} rotationIntensity={0.3} floatIntensity={0.6}>
         {/* Main Avatar Headshot */}
         <mesh ref={meshRef}>
@@ -86,6 +86,8 @@ export function Avatar3D({ isVisible }: { isVisible: boolean }) {
             side={THREE.DoubleSide}
             roughness={0.3}
             metalness={0.2}
+            emissive="#ffffff"
+            emissiveIntensity={0.2}
           />
         </mesh>
 

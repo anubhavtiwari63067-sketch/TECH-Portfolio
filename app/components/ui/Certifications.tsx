@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Award, Star, Cpu, Code, Database } from 'lucide-react';
 
 const certs = [
-  { name: 'Full Stack Dev', org: 'Physics Wallah (PW) Skills', icon: Code, color: 'text-cyan-500' },
+  { name: 'Full Stack Dev', org: 'Physics Wallah (PW) Skills', icon: Code, color: 'text-cyan-500', link: 'https://pwskills.com/' },
   { name: 'AI Integration', org: 'Advanced Workflow Training', icon: Cpu, color: 'text-purple-500' },
   { name: 'MERN Architecture', org: 'Next-Gen Stack Certification', icon: Database, color: 'text-blue-500' },
   { name: 'Responsive Design', org: 'UI/UX Mastery Workshop', icon: Star, color: 'text-pink-500' },
@@ -27,13 +27,16 @@ export default function Certifications() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full">
           {certs.map((cert, idx) => (
-             <motion.div 
+             <motion.a 
+               href={cert.link || '#'}
+               target={cert.link ? "_blank" : "_self"}
+               rel={cert.link ? "noopener noreferrer" : ""}
                key={idx}
                initial={{ opacity: 0, scale: 0.9, y: 20 }}
                whileInView={{ opacity: 1, scale: 1, y: 0 }}
                transition={{ delay: idx * 0.1 }}
                whileHover={{ y: -10, scale: 1.05 }}
-               className="p-8 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 group cursor-pointer hover:bg-white/10 transition-all duration-300 flex flex-col items-center text-center gap-6 shadow-[0_4px_40px_rgba(0,0,0,0.5)]"
+               className="p-8 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 group cursor-pointer hover:bg-white/10 transition-all duration-300 flex flex-col items-center text-center gap-6 shadow-[0_4px_40px_rgba(0,0,0,0.5)] block"
              >
                 <div className={`w-16 h-16 rounded-3xl bg-black border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 ${cert.color}`}>
                    <cert.icon className="w-8 h-8" />
@@ -45,7 +48,7 @@ export default function Certifications() {
                 <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
                    <ShieldCheck className="w-4 h-4 text-cyan-500" />
                 </div>
-             </motion.div>
+             </motion.a>
           ))}
         </div>
 

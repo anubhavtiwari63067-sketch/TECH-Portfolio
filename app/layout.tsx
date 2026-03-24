@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Outfit, Space_Grotesk } from "next/font/google";
+import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -17,8 +18,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
-      <body className={`${inter.variable} ${outfit.variable} ${spaceGrotesk.variable} bg-black text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-400`}>
+    <html lang="en" className="dark scroll-smooth" suppressHydrationWarning>
+      <body 
+        className={cn(
+          inter.variable, 
+          outfit.variable, 
+          spaceGrotesk.variable, 
+          "bg-black text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-400"
+        )}
+        suppressHydrationWarning
+      >
         {/* 
           Satisfy buggy Chrome extensions (e.g., Emily AI) that crash if they don't find these IDs.
           We inject them via a script so they exist in the DOM but don't interfere with React's hydration.
