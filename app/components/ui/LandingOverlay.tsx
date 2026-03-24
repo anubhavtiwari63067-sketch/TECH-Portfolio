@@ -13,7 +13,7 @@ export default function LandingOverlay({ onStart }: { onStart: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-[2px] overflow-hidden">
       <AnimatePresence mode="wait">
         {!isPoweringOn ? (
           <motion.button
