@@ -33,9 +33,12 @@ function DataStreams({ count = 20 }) {
 
 function DataStream({ start, speed, length }: { start: THREE.Vector3, speed: number, length: number }) {
   const meshRef = useRef<THREE.Group>(null);
+  // Faster data stream flow
+  const flowSpeed = speed * 1.5; 
+  
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.position.z += speed;
+      meshRef.current.position.z += flowSpeed;
       if (meshRef.current.position.z > 10) meshRef.current.position.z = -10;
     }
   });
@@ -154,8 +157,10 @@ function FuturisticBrain() {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.1;
-      const scale = 1 + Math.sin(t * 2) * 0.05;
+      // Faster rotation for more energy
+      groupRef.current.rotation.y = t * 0.15;
+      // Stronger pulse: more frequency (t*3) and more scale (0.1)
+      const scale = 1 + Math.sin(t * 3) * 0.1;
       groupRef.current.scale.set(scale, scale, scale);
     }
   });
@@ -208,7 +213,7 @@ export function FuturisticHero() {
       {/* Midground Layer - Neural Network */}
       <group position={[0, 0, 0]}>
         <FuturisticBrain />
-        <DataStreams count={30} />
+        <DataStreams count={60} />
       </group>
 
       {/* Foreground Layer - Icons */}
