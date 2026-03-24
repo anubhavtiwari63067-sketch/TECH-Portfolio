@@ -14,7 +14,7 @@ import Certifications from "./components/ui/Certifications";
 import Contact from "./components/ui/Contact";
 import Footer from "./components/ui/Footer";
 import MusicPlayer from "./components/ui/MusicPlayer";
-import { AIBrain } from "./components/three/AIBrain";
+import { SolarSystem } from "./components/three/SolarSystem";
 import CyberBackground from "./components/ui/CyberBackground";
 import CursorGlow from "./components/ui/CursorGlow";
 import { motion, AnimatePresence } from "framer-motion";
@@ -56,64 +56,40 @@ export default function Home() {
       <CyberBackground />
       <CursorGlow />
       
-      {/* 3D Background - Always there, but transitions its intensity */}
-      <div className={`fixed inset-0 z-0 pointer-events-none transition-opacity duration-1000 ${hasStarted ? 'opacity-100' : 'opacity-40'}`}>
-        {/* CSS Fallback background with "Orbit" simulation for when WebGL is unavailable */}
+      {/* 3D Background - Solar System Orbit Theme */}
+      <div className={`fixed inset-0 z-0 pointer-events-none transition-opacity duration-1000 ${hasStarted ? 'opacity-100' : 'opacity-60'}`}>
         {!webglSupported && (
           <div className="absolute inset-0 bg-[#000] overflow-hidden">
-            {/* Rotating Starfield Fallback */}
             <div className="absolute inset-[-50%] opacity-20 bg-[radial-gradient(circle_at_center,_#22d3ee_0%,_transparent_2px)] bg-[length:50px_50px] animate-orbit-slow" />
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_100%)] from-cyan-500/20" />
-            
-            {/* Rotating Grid Fallback */}
             <div className="absolute inset-[-50%] grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))] opacity-[0.05] animate-orbit-slow-reverse">
               {Array.from({ length: 1600 }).map((_, i) => (
                 <div key={i} className="border-[0.5px] border-cyan-500" />
               ))}
             </div>
-
-            {/* Logo Fallback for the Avatar if WebGL is disabled */}
-            {hasStarted && showContent && (
-              <div className="absolute top-1/2 right-[15%] -translate-y-1/2 w-48 h-48 rounded-full border border-cyan-500/30 flex items-center justify-center animate-pulse">
-                <img src="/avatar.jpg" alt="Profile" className="w-40 h-40 rounded-full object-cover border-2 border-cyan-500 shadow-[0_0_20px_#22d3ee]" />
-              </div>
-            )}
           </div>
         )}
 
         {mounted && webglSupported && (
           <Canvas 
-            camera={{ position: [0, 0, 7], fov: 45 }}
+            camera={{ position: [0, 8, 12], fov: 45 }}
             gl={{ 
               antialias: true,
               powerPreference: 'high-performance',
-              failIfMajorPerformanceCaveat: false 
             }}
           >
-            <fog attach="fog" args={["#000", 2, 12]} />
-            <ambientLight intensity={2} />
-            <pointLight position={[5, 10, 5]} intensity={2} />
+            <fog attach="fog" args={["#000", 2, 25]} />
+            <ambientLight intensity={1} />
+            <pointLight position={[0, 10, 0]} intensity={2} color="#22d3ee" />
             <color attach="background" args={["#000"]} />
             <Suspense fallback={null}>
-              <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-                <Starfield />
-              </Float>
-              {hasStarted && (
-                <group scale={showContent ? 1 : 0}>
-                  <Grid />
-                  {/* Positioned for the Hero section with better visibility */}
-                  <group position={[2.2, 0.5, 0]}>
-                    <Suspense fallback={<mesh><sphereGeometry args={[1, 32, 32]} /><meshStandardMaterial color="#22d3ee" wireframe /></mesh>}>
-                      <AIBrain />
-                    </Suspense>
-                  </group>
-                </group>
-              )}
+              <Starfield />
+              <SolarSystem />
               <OrbitControls 
                 enableZoom={false} 
                 enablePan={false} 
                 autoRotate 
-                autoRotateSpeed={0.5} 
+                autoRotateSpeed={0.2} 
               />
             </Suspense>
           </Canvas>
