@@ -14,7 +14,7 @@ import Certifications from "./components/ui/Certifications";
 import Contact from "./components/ui/Contact";
 import Footer from "./components/ui/Footer";
 import MusicPlayer from "./components/ui/MusicPlayer";
-import { SolarSystem } from "./components/three/SolarSystem";
+import { FuturisticHero } from "./components/three/FuturisticHero";
 import CyberBackground from "./components/ui/CyberBackground";
 import CursorGlow from "./components/ui/CursorGlow";
 import { motion, AnimatePresence } from "framer-motion";
@@ -56,8 +56,8 @@ export default function Home() {
       <CyberBackground />
       <CursorGlow />
       
-      {/* 3D Background - Solar System Orbit Theme */}
-      <div className={`fixed inset-0 z-0 pointer-events-none transition-opacity duration-1000 ${hasStarted ? 'opacity-100' : 'opacity-60'}`}>
+      {/* 3D Background - Futuristic Cyberpunk Theme */}
+      <div className={`fixed inset-0 z-0 pointer-events-none transition-opacity duration-1500 ${hasStarted ? 'opacity-100' : 'opacity-60'}`}>
         {!webglSupported && (
           <div className="absolute inset-0 bg-[#000] overflow-hidden">
             <div className="absolute inset-[-50%] opacity-20 bg-[radial-gradient(circle_at_center,_#22d3ee_0%,_transparent_2px)] bg-[length:50px_50px] animate-orbit-slow" />
@@ -72,25 +72,24 @@ export default function Home() {
 
         {mounted && webglSupported && (
           <Canvas 
-            camera={{ position: [0, 8, 12], fov: 45 }}
+            camera={{ position: [0, 0, 10], fov: 45 }}
             gl={{ 
               antialias: true,
               powerPreference: 'high-performance',
             }}
           >
-            <fog attach="fog" args={["#000", 2, 25]} />
-            <ambientLight intensity={1} />
-            <pointLight position={[0, 10, 0]} intensity={2} color="#22d3ee" />
+            <fog attach="fog" args={["#000", 5, 25]} />
+            <ambientLight intensity={0.5} />
+            <pointLight position={[0, 10, 0]} intensity={1} color="#22d3ee" />
             <color attach="background" args={["#000"]} />
             <Suspense fallback={null}>
-              <Starfield />
-              <SolarSystem />
-              <OrbitControls 
+               <FuturisticHero />
+               <OrbitControls 
                 enableZoom={false} 
                 enablePan={false} 
                 autoRotate 
-                autoRotateSpeed={0.2} 
-              />
+                autoRotateSpeed={0.15} 
+               />
             </Suspense>
           </Canvas>
         )}
