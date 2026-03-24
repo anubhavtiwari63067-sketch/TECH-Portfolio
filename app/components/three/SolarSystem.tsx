@@ -207,12 +207,10 @@ function Stars() {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={points.length / 3}
-          array={points}
-          itemSize={3}
+          args={[points, 3]}
         />
       </bufferGeometry>
-      <pointsMaterial color="#22d3ee" size={0.05} transparent opacity={0.5} sizeAttenuation />
+      <pointsMaterial color="#22d3ee" size={0.05} transparent opacity={0.5} sizeAttenuation={true} />
     </points>
   );
 }
