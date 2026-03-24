@@ -119,6 +119,72 @@ function CircuitPlane({ textureUrl }: { textureUrl: string }) {
     );
 }
 
+// --- HUD ELEMENTS ---
+function HUDRing({ radius, rotationSpeed, color, dashScale = 1 }: { radius: number, rotationSpeed: number, color: string, dashScale?: number }) {
+  const ref = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    if (ref.current) {
+        ref.current.rotation.z += rotationSpeed;
+    }
+  });
+
+  return (
+    <group ref={ref} rotation={[Math.PI / 2, 0, 0]}>
+       <mesh>
+          <ringGeometry args={[radius, radius + 0.05, 64]} />
+          <meshBasicMaterial 
+              color={color} 
+              transparent 
+              opacity={0.15} 
+              blending={THREE.AdditiveBlending} 
+              side={THREE.DoubleSide}
+          />
+       </mesh>
+       {/* Small notches around the ring */}
+       {[...Array(24)].map((_, i) => (
+          <mesh key={i} rotation={[0, 0, (i * Math.PI * 2) / 24]} position={[0, -radius, 0.01]}>
+             <boxGeometry args={[0.02, 0.1, 0.01]} />
+             <meshBasicMaterial color={color} transparent opacity={0.4} blending={THREE.AdditiveBlending} />
+          </mesh>
+       ))}
+    </group>
+  );
+}
+
+function DataReadout({ position, label, value }: { position: [number, number, number], label: string, value: string }) {
+    return (
+        <group position={position}>
+            <Text
+                fontSize={0.15}
+                color="#22d3ee"
+                anchorX="left"
+                font="https://fonts.gstatic.com/s/orbitron/v25/yYqxR928V8_S_TSh670q.woff"
+            >
+                {label}
+            </Text>
+            <Text
+                position={[0, -0.25, 0]}
+                fontSize={0.25}
+                color="white"
+                anchorX="left"
+                font="https://fonts.gstatic.com/s/orbitron/v25/yYqxR928V8_S_TSh670q.woff"
+            >
+                {value}
+            </Text>
+            {/* Corner Bracket */}
+            <mesh position={[-0.1, 0.1, 0]}>
+                <boxGeometry args={[0.02, 0.2, 0.02]} />
+                <meshBasicMaterial color="#22d3ee" transparent opacity={0.5} />
+            </mesh>
+            <mesh position={[0, 0.2, 0]}>
+                <boxGeometry args={[0.2, 0.02, 0.02]} />
+                <meshBasicMaterial color="#22d3ee" transparent opacity={0.5} />
+            </mesh>
+        </group>
+    );
+}
+
 // --- THE HOLOGRAPHIC BRAIN ---
 function FuturisticBrain() {
   const groupRef = useRef<THREE.Group>(null);
@@ -202,6 +268,21 @@ function FuturisticBrain() {
   );
 }
 
+function ScanningLine() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (meshRef.current) {
+        meshRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 6;
+    }
+  });
+  return (
+    <mesh ref={meshRef} position={[0, 0, -2]}>
+        <planeGeometry args={[20, 0.05]} />
+        <meshBasicMaterial color="#22d3ee" transparent opacity={0.6} blending={THREE.AdditiveBlending} />
+    </mesh>
+  );
+}
+
 export function FuturisticHero() {
   return (
     <group>
@@ -210,19 +291,33 @@ export function FuturisticHero() {
         <CircuitPlane textureUrl="/cyber_circuit_pattern.png" />
       </Suspense>
 
-      {/* Midground Layer - Neural Network */}
+      {/* MIDGROUND: Layered HUD Rings */}
       <group position={[0, 0, 0]}>
+        <HUDRing radius={2.5} rotationSpeed={0.005} color="#22d3ee" />
+        <HUDRing radius={3.2} rotationSpeed={-0.008} color="#c084fc" />
+        <HUDRing radius={1.8} rotationSpeed={0.012} color="#22d3ee" dashScale={0.5} />
+        
         <FuturisticBrain />
         <DataStreams count={60} />
       </group>
 
+      {/* HUD Readouts (Corners) */}
+      <group>
+          <DataReadout position={[-6.5, 3.5, -1]} label="NEURAL_STATE" value="OPTIMIZED" />
+          <DataReadout position={[4.5, 3.5, -1]} label="FLOW_RATE" value="1.2 Gbps" />
+          <DataReadout position={[-6.5, -3.5, -1]} label="ENCRYPTION" value="AES-256" />
+          <DataReadout position={[4.5, -3.5, -1]} label="SYSTEM" value="STABLE" />
+      </group>
+
+      <ScanningLine />
+
       {/* Foreground Layer - Icons */}
-      <FloatingIcon position={[-4, 2, 2]} label="JavaScript" color="#f7df1e" />
-      <FloatingIcon position={[4, 2, 0]} label="React" color="#61dafb" />
-      <FloatingIcon position={[-3, -3, 3]} label="Node.js" color="#339933" />
-      <FloatingIcon position={[3, -3, 1]} label="AI" color="#ff00ff" />
+      <FloatingIcon position={[-4, 2, 2]} label="JS_CORE" color="#f7df1e" />
+      <FloatingIcon position={[4, 2, 0]} label="REACT_UI" color="#61dafb" />
+      <FloatingIcon position={[-3, -3, 3]} label="NODE_BACKEND" color="#339933" />
+      <FloatingIcon position={[3, -3, 1]} label="AI_MODEL" color="#ff00ff" />
       
-      {/* User Avatar - Floating */}
+      {/* User Avatar - Unified with HUD */}
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5} position={[0, -2.5, 5]}>
          <group>
             <DreiImage
@@ -235,7 +330,12 @@ export function FuturisticHero() {
             </DreiImage>
             <mesh rotation={[Math.PI / 2, 0, 0]}>
                 <torusGeometry args={[0.8, 0.02, 16, 100]} />
-                <meshBasicMaterial color="#22d3ee" />
+                <meshBasicMaterial color="#22d3ee" blending={THREE.AdditiveBlending} />
+            </mesh>
+            {/* HUD element for avatar */}
+            <mesh rotation={[Math.PI/2, 0, 0]}>
+                <ringGeometry args={[0.9, 1, 32]} />
+                <meshBasicMaterial color="#c084fc" transparent opacity={0.3} blending={THREE.AdditiveBlending} />
             </mesh>
          </group>
       </Float>
@@ -243,9 +343,10 @@ export function FuturisticHero() {
       {/* Atmosphere */}
       <Stars count={3000} />
       
-      {/* Lighting focus */}
+      {/* High-tech Lighting focus */}
       <spotLight position={[0, 10, 10]} angle={0.5} penumbra={1} intensity={2} color="#22d3ee" />
       <pointLight position={[0, -5, -5]} intensity={1} color="#0000ff" />
+      <rectAreaLight position={[0, 0, -2]} width={20} height={0.1} color="#22d3ee" intensity={10} />
     </group>
   );
 }
